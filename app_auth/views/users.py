@@ -25,8 +25,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        print("email, password", email, password)
-
         try:
             # Retrieve user by email
             user = CustomUser.objects.get(email=email)

@@ -22,18 +22,25 @@ class CustomUserCreateView(APIView):
         request_body=CustomUserCreateSerializer,
     )
     def post(self, request, *args, **kwargs):
+        print("Registration Entry")
         unverified_user = CustomUser.objects.filter(email=request.data.get('email'), is_active=False)
+        print("unverified_user", unverified_user)
         if unverified_user.exists():
             key = f"otp_{unverified_user[0].email}"
             cache.delete(key)
             unverified_user[0].delete()
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(
-            {"message": "User created successfully, OTP sent to email."},
-            status=status.HTTP_201_CREATED
-        )
+        print("serializer", serializer)
+        if serializer.is_valid():
+            print("serializer validated")
+            serializer.save()
+            print("serializer saved")
+            return Response(
+                {"message": "User created successfully, OTP sent to email."},
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyOTPView(generics.GenericAPIView):
