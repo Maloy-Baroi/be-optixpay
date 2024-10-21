@@ -25,6 +25,7 @@ class CreateUserAndMerchantAPIView(APIView):
             # Set hashed password
             user_serializer.validated_data['password'] = make_password(user_serializer.validated_data['password'])
             user = user_serializer.save()
+            print(user.id)
 
             # Set the user reference in merchant data
             merchant_data['user'] = user.id

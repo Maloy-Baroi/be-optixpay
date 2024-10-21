@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/v1/app-auth/', include('app_auth.urls')),
     path('api/v1/app-transaction/', include('app_transaction.urls')),
     path('api/v1/app-merchant/', include('app_merchant.urls')),
+    path('api/v1/app-agent/', include('app_agent.urls')),
     path('api/v1/core/', include('core.urls')),
     path('api/v1/app-payment/', include('app_payment.urls')),
 
