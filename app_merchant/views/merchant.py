@@ -106,9 +106,8 @@ class VerifyMerchantView(APIView):
             api_key = request.data.get('api_key')
             secret_key = request.data.get('secret_key')
             payment_method = request.data.get('payment_method')
-            print("Payment Method: ", payment_method)
             merchant = Merchant.objects.get(api_key=api_key, secret_key=secret_key)
-
+            print("Merchant", merchant)
             if merchant:
                 # Fetch a payment aggregator agent that supports the provided payment_method (provider)
                 selected_agent_ids = PaymentAggregatorAgent.objects.filter(
