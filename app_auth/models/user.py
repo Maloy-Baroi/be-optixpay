@@ -6,27 +6,25 @@ from django.core.validators import RegexValidator
 
 # app_auth/models.py
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def _create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError('The email field must be set')
+            raise ValueError("The email field must be set!")
+        email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+        if not extra_fields.get('is_staff'):
+            raise ValueError("Superuser must have is_staff=True")
+        if not extra_fields.get('is_superuser'):
+            raise ValueError("Superuser must have is_superuser=True")
 
-        user = self.create_user(email, password, **extra_fields)
-        user.save(using=self._db)
-        return user
-
+        return self._create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_regex = RegexValidator(
@@ -69,9 +67,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name='user permissions',
     )
 
-    def save(self, *args, **kwargs):
-        if not self._state.adding and self.password != self.__class__.objects.get(pk=self.pk).password:
-            self.set_password(self.password)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self._state.adding and self.password != self.__class__.objects.get(pk=self.pk).password:
+    #         self.set_password(self.password)
+    #     super().save(*args, **kwargs)
 
 

@@ -24,7 +24,6 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
 
         otp = random.randint(100000, 999999)  # Generate a 6-digit OTP
         cache.set(f"otp_{user.email}", otp, timeout=300)  # Save OTP in Redis with 5 min TTL
-        print(cache.get(f"otp_{user.email}"))
 
         # Prepare the HTML email content
         subject = 'Your One-Time Password (OTP) Code'

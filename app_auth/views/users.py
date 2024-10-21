@@ -25,34 +25,45 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        user = authenticate(email=email, password=password)
+        print("email, password", email, password)
 
-        if user is not None:
-            # Generate tokens
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
+        try:
+            # Retrieve user by email
+            user = CustomUser.objects.get(email=email)
 
-            # New user
-            new_user = user.new_user
-            user_profile = AgentProfile.objects.filter(user=user)
-            if new_user and user_profile.exists():
-                user.new_user = False
-                user.save()
+            # Check if the provided password matches the stored password
+            if user.check_password(password):
+                # Generate tokens
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
 
-            # Get user groups
-            groups = user.groups.all().values_list('name', flat=True)
-            permissions = user.user_permissions.all()
+                # New user
+                # new_user = user.new_user
+                # user_profile = AgentProfile.objects.filter(user=user)
+                # if new_user and user_profile.exists():
+                #     user.new_user = False
+                #     user.save()
 
-            # permission_serializers = PermissionSerializer(permissions, many=True)
-            return Response({
-                'refresh': str(refresh),
-                'access': access_token,
-                'groups': list(groups),
-                'new_user': new_user
-                # 'permissions': permission_serializers
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+                # Get user groups
+                groups = user.groups.all().values_list('name', flat=True)
+                permissions = user.user_permissions.all()
+
+                # permission_serializers = PermissionSerializer(permissions, many=True)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': access_token,
+                    'groups': list(groups),
+                    # 'permissions': permission_serializers
+                }, status=status.HTTP_200_OK)
+                # If password is correct, proceed to issue the token
+                # return super().post(request, *args, **kwargs)
+            else:
+                # If password is incorrect, return an error response
+                return Response({'detail': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        except CustomUser.DoesNotExist:
+            # If the user does not exist, return an error response
+            return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class CustomTokenRefreshView(TokenRefreshView):

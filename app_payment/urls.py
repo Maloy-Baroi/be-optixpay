@@ -1,6 +1,6 @@
 from django.urls import path
 from app_payment.views.bkash import DepositBKashPayView, BkashPaymentInitiateAPIView, BkashPaymentExecuteAPIView
-from app_payment.views.nagad import PaymentCallbackAPIView, StartPaymentAPIView
+from app_payment.views.nagad import NagadPaymentInitiateView, NagadPaymentConfirmView
 from app_payment.views.payment_details import PaymentListAPIView
 
 urlpatterns = [
@@ -11,6 +11,6 @@ urlpatterns = [
     path('payment-list/', PaymentListAPIView.as_view(), name='payment-list'),
 
     # Nagad
-    path('start-payment/', StartPaymentAPIView.as_view(), name='start_payment'),
-    path('payment-callback/', PaymentCallbackAPIView.as_view(), name='payment_callback'),
+    path('nagad/initiate/', NagadPaymentInitiateView.as_view(), name='nagad-initiate'),
+    path('nagad/confirm/', NagadPaymentConfirmView.as_view(), name='nagad-confirm'),
 ]

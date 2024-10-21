@@ -1,47 +1,35 @@
-# views.py
+# payments/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from services.nagad import initiate_payment, verify_payment
+from services.nagad import NagadPaymentService
 
-class StartPaymentAPIView(APIView):
-    def post(self, request):
-        # Extracting data from the request body
-        amount = request.data.get('amount')
-        order_id = request.data.get('order_id')
+class NagadPaymentInitiateView(APIView):
+    def post(self, request, *args, **kwargs):
+        order_id = request.data.get("order_id")
+        amount = request.data.get("amount")
+        if not order_id or not amount:
+            return Response({"error": "Missing order_id or amount"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Initiate the payment
-        payment_response = initiate_payment(amount, order_id)
+        service = NagadPaymentService()
+        result = service.initiate_payment(amount, order_id)
 
-        # If the initiation is successful, return the payment URL
-        if payment_response.get('status') == 'success':
-            return Response({
-                'message': 'Payment initiation successful',
-                'payment_url': payment_response.get('payment_url')
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                'message': 'Payment initiation failed',
-                'error': payment_response.get('error', 'An error occurred')
-            }, status=status.HTTP_400_BAD_REQUEST)
+        print(result)
+
+        if "error" in result:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+        return Response(result, status=status.HTTP_200_OK)
 
 
-class PaymentCallbackAPIView(APIView):
-    def get(self, request):
-        # Extract payment_id from query parameters
-        payment_id = request.query_params.get('payment_id')
+class NagadPaymentConfirmView(APIView):
+    def post(self, request, *args, **kwargs):
+        payment_ref = request.data.get("payment_ref")
+        if not payment_ref:
+            return Response({"error": "Missing payment_ref"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verify the payment
-        verification_response = verify_payment(payment_id)
+        service = NagadPaymentService()
+        result = service.confirm_payment(payment_ref)
 
-        # If the verification is successful, handle the success logic
-        if verification_response.get('status') == 'success':
-            return Response({
-                'message': 'Payment verified successfully',
-                'data': verification_response
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                'message': 'Payment verification failed',
-                'error': verification_response.get('error', 'Verification error')
-            }, status=status.HTTP_400_BAD_REQUEST)
+        if "error" in result:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+        return Response(result, status=status.HTTP_200_OK)
