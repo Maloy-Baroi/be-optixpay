@@ -1,35 +1,32 @@
-# payments/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from services.nagad import NagadPaymentService
+from app_payment.utils import NagadAPIService
 
-class NagadPaymentInitiateView(APIView):
-    def post(self, request, *args, **kwargs):
-        order_id = request.data.get("order_id")
-        amount = request.data.get("amount")
-        if not order_id or not amount:
-            return Response({"error": "Missing order_id or amount"}, status=status.HTTP_400_BAD_REQUEST)
-
-        service = NagadPaymentService()
-        result = service.initiate_payment(amount, order_id)
-
-        print(result)
-
-        if "error" in result:
-            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+class StartPaymentView(APIView):
+    def post(self, request):
+        order_id = request.data.get('order_id')
+        amount = request.data.get('amount')
+        print(f"Order ID: {order_id} \namount: {amount}")
+        
+        nagad_service = NagadAPIService()
+        result = nagad_service.initialize_payment(order_id, amount)
+        
         return Response(result, status=status.HTTP_200_OK)
 
+class CompletePaymentView(APIView):
+    def post(self, request):
+        payment_ref_id = request.data.get('payment_ref_id')
+        amount = request.data.get('amount')
+        
+        nagad_service = NagadAPIService()
+        result = nagad_service.complete_payment(payment_ref_id, amount)
+        
+        return Response(result, status=status.HTTP_200_OK)
 
-class NagadPaymentConfirmView(APIView):
-    def post(self, request, *args, **kwargs):
-        payment_ref = request.data.get("payment_ref")
-        if not payment_ref:
-            return Response({"error": "Missing payment_ref"}, status=status.HTTP_400_BAD_REQUEST)
-
-        service = NagadPaymentService()
-        result = service.confirm_payment(payment_ref)
-
-        if "error" in result:
-            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+class CheckPaymentStatusView(APIView):
+    def get(self, request, payment_ref_id):
+        nagad_service = NagadAPIService()
+        result = nagad_service.check_payment_status(payment_ref_id)
+        
         return Response(result, status=status.HTTP_200_OK)

@@ -14,7 +14,6 @@ from rest_framework import status
 
 from app_merchant.models.merchant import Merchant
 from app_payment.models.payment import Payment
-from app_payment.utils import get_bkash_token
 from services.bkash_create_sandbox import bkash_create_sandbox
 from services.invoice_generator import generate_invoice_number
 

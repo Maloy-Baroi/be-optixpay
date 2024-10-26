@@ -12,7 +12,7 @@ class CreateUserAgentProviderAPIView(APIView):
         # Extract user data from the request
         user_data = request.data.get('user')
         agent_data = request.data.get('agent')
-        providers_data = request.data.getlist('providers')  # In case it's multiple providers
+        providers_data = request.data.get('providers', [])  # In case it's multiple providers
 
         # Step 1: Create user
         user = CustomUser.objects.create(
@@ -22,7 +22,7 @@ class CreateUserAgentProviderAPIView(APIView):
         )
 
         # Step 2: Create agent profile (including handling file uploads)
-        agent_serializer = AgentProfileSerializer(data=agent_data, files=request.FILES)
+        agent_serializer = AgentProfileSerializer(data=agent_data)
         if not agent_serializer.is_valid():
             return Response(agent_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

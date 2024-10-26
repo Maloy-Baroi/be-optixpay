@@ -6,7 +6,8 @@ from app_agent.models.agent import AgentProfile, PaymentAggregatorAgent, Payment
 class AgentProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = AgentProfile
-        fields = ['full_name', 'email', 'date_of_birth', 'phone_number', 'nationality', 'nid_number', 'telegram_account', 'verification_type', 'front_side_document', 'back_side_document', 'selfie_with_document']
+        fields = ['full_name', 'email', 'date_of_birth', 'phone_number', 'nationality', 'nid_number',
+                  'telegram_account', 'verification_type']
 
 
 class PaymentProviderSerializer(serializers.ModelSerializer):
