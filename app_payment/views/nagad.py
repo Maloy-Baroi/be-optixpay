@@ -19,13 +19,16 @@ credentials = {
 
 class StartPaymentView(APIView):
     def post(self, request):
-        order_id = request.data.get('order_id')
-        amount = request.data.get('amount')
+        try:
+            order_id = request.data.get('order_id')
+            amount = request.data.get('amount')
 
-        nagad = Nagad(credentials)
-        response = nagad.regular_payment(order_id=order_id, amount=amount)
+            nagad = Nagad(credentials)
+            response = nagad.regular_payment(order_id=order_id, amount=amount)
 
-        return Response(response, status=status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 # class CompletePaymentView(APIView):
 #     def post(self, request):
