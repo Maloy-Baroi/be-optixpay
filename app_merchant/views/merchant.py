@@ -107,7 +107,7 @@ class VerifyMerchantView(APIView):
             secret_key = request.data.get('secret_key')
             payment_method = request.data.get('payment_method')
             merchant = Merchant.objects.get(api_key=api_key, secret_key=secret_key)
-            print("Merchant", merchant)
+
             if merchant:
                 # Fetch a payment aggregator agent that supports the provided payment_method (provider)
                 selected_agent_ids = PaymentAggregatorAgent.objects.filter(
@@ -136,11 +136,19 @@ class VerifyMerchantView(APIView):
                             'provider_password': provider_data.password,
                         }
 
-                        return Response({
-                            'message': 'Merchant is verified.',
-                            'agent_data': agent_data,
-                            'my_merxt': merchant.id
-                        }, status=status.HTTP_200_OK)
+                        if payment_method.lower() == 'bkash':
+                            return Response({
+                                'message': 'Merchant is verified.',
+                                'agent_data': agent_data,
+                                'my_merxt': merchant.id
+                            }, status=status.HTTP_200_OK)
+                        elif payment_method.lower() == 'nagad':
+                            return Response({
+                                'message': 'Merchant is verified.',
+                                'agent_data': agent_data,
+                                'my_merxt': merchant.id,
+                                'orderId': f"order{random.randint(100000, 9999999999999)}",
+                            }, status=status.HTTP_200_OK)
                     else:
                         return Response({'message': f'No provider found for payment method: {payment_method}'}, status=status.HTTP_400_BAD_REQUEST)
             else:

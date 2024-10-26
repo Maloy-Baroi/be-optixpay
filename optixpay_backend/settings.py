@@ -2,10 +2,13 @@ from pathlib import Path
 import os
 from decouple import config
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -152,7 +155,6 @@ NAGAD_MERCHANT_PUBLIC_KEY = os.path.join(BASE_DIR, 'keys', "Merchant_MC00VHB2008
 NAGAD_MERCHANT_PRIVATE_KEY = os.path.join(BASE_DIR, 'keys', "Merchant_MC00VHB20088378_1729337532364_pri.pem")
 NAGAD_CALLBACK_URL = 'http://optixpay.com/'
 NAGAD_API_VERSION = 'v-0.2.0'  # as mentioned in the guide
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

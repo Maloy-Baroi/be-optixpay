@@ -1,104 +1,157 @@
-import json
-
 import requests
-from django.conf import settings
-from services.nagad import encrypt_sensitive_data, sign_sensitive_data, get_current_datetime
-import secrets
+import json
+import socket
+import rsa
+import random
+import base64
+import datetime
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 
-def generate_challenge():
-    """Generates a secure random string for the challenge."""
-    return secrets.token_hex(20)  # Generates a 40-character hex string
+class Nagad:
+    def __init__(self, credentials):
+        self.client = requests.Session()
+        self.credentials = credentials
+        self.additional_merchant_info = {}
 
+    def set_additional_merchant_info(self, additional_info):
+        self.additional_merchant_info = additional_info
 
-class NagadAPIService:
-    def __init__(self):
-        self.base_url = settings.NAGAD_BASE_URL
-        self.merchant_id = settings.NAGAD_MERCHANT_ID
-        self.merchant_mobile_number = settings.NAGAD_MERCHANT_MOBILE_NUMBER
+    def regular_payment(self, order_id, amount):
+        base_url = "https://sandbox-ssl.mynagad.com" if self.credentials['isSandbox'] else "https://api.mynagad.com"
+        kpg_default_seed = f"nagad-dfs-service-ltd{int(datetime.datetime.now().timestamp() * 1000)}"
 
-    def initialize_payment(self, order_id, amount):
-        """Initialize the payment session."""
-        sensitive_data = {
-            "merchantId": self.merchant_id,
-            "dateTime": get_current_datetime(),
-            "orderId": order_id,
-            "challenge": generate_challenge()  # generate a secure random string
+        # Load and convert the public key using cryptography
+        public_key_obj = serialization.load_pem_public_key(
+            self.credentials['pgPublicKey'].encode(),
+            backend=default_backend()
+        )
+        public_key = rsa.PublicKey.load_pkcs1(
+            public_key_obj.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.PKCS1
+            )
+        )
+
+        # Load and convert the private key using cryptography
+        private_key_obj = serialization.load_pem_private_key(
+            self.credentials['merchantPrivateKey'].encode(),
+            password=None,
+            backend=default_backend()
+        )
+        private_key = rsa.PrivateKey.load_pkcs1(
+            private_key_obj.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+        )
+
+        datetime_now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        random_challenge = self.generate_random_string(20, kpg_default_seed.encode())
+
+        raw_data = {
+            'merchantId': self.credentials['merchantID'],
+            'orderId': order_id,
+            'datetime': datetime_now,
+            'challenge': random_challenge
         }
 
-        # Convert the sensitive data to a JSON string before encrypting
-        sensitive_data_str = json.dumps(sensitive_data)
+        # Encrypt raw data with the public key
+        raw_data_to_be_encrypted = json.dumps(raw_data)
+        sensitive_data = base64.b64encode(rsa.encrypt(raw_data_to_be_encrypted.encode(), public_key)).decode()
 
-        encrypted_data = encrypt_sensitive_data(sensitive_data_str)
-        print("Encrypted Data:", format(encrypted_data))
-        signature = sign_sensitive_data(sensitive_data_str)
+        # Sign the data with the private key
+        signature = base64.b64encode(rsa.sign(raw_data_to_be_encrypted.encode(), private_key, 'SHA-256')).decode()
 
-        print(f"signature: {signature}")
-
-        payload = {
-            # "accountNumber": self.merchant_mobile_number,  # optional
-            "dateTime": get_current_datetime(),
-            "sensitiveData": encrypted_data,
-            "signature": signature,
-        }
+        # Get IP address
+        ip_address = self.get_ip_address()
 
         headers = {
-            "user-agent": "OptixPay/1.0 (Django REST Framework)",
-            "x-km-api-version": "v-0.2.0",
-            "x-km-ip-v4": "192.168.0.102",
-            "accept-encoding": "gzip",
-            "host": "sandbox-ssl.mynagad.com",
-            "content-type": "application/json; charset=utf-8",
-            "x-km-client-type": "PC_WEB"
+            'Content-Type': 'application/json',
+            'X-KM-IP-V4': ip_address,
+            'X-KM-Client-Type': 'MOBILE_APP',
+            'X-KM-Api-Version': 'v-0.2.0',
         }
 
-        response = requests.post(
-            f"{self.base_url}/check-out/initialize/{self.merchant_id}/{order_id}",
-            json=payload,
-            headers=headers
-        )
+        # API call to initialize checkout
+        try:
+            response = self.client.post(
+                f"{base_url}/api/dfs/check-out/initialize/{self.credentials['merchantID']}/{order_id}",
+                headers=headers,
+                json={
+                    'dateTime': datetime_now,
+                    'sensitiveData': sensitive_data,
+                    'signature': signature,
+                }
+            )
+        except requests.RequestException as e:
+            raise Exception(f"Exception in Check Out Initialize API {e}")
 
         if response.status_code == 200:
-            return response.json()
+            response_body = response.json()
+            sensitive_data = response_body['sensitiveData']
+            signature = response_body['signature']
+
+            # Decrypt the response
+            decrypted_data = rsa.decrypt(base64.b64decode(sensitive_data), private_key).decode()
+            verified = rsa.verify(decrypted_data.encode(), base64.b64decode(signature), public_key)
+
+            if verified:
+                decrypted_data_body = json.loads(decrypted_data)
+                challenge = decrypted_data_body['challenge']
+                payment_reference_id = decrypted_data_body['paymentReferenceId']
+
+                raw_data = {
+                    'merchantId': self.credentials['merchantID'],
+                    'orderId': str(order_id),
+                    'currencyCode': '050',
+                    'amount': amount,
+                    'challenge': challenge
+                }
+                raw_data_to_be_encrypted = json.dumps(raw_data)
+                sensitive_data = base64.b64encode(rsa.encrypt(raw_data_to_be_encrypted.encode(), public_key)).decode()
+                signature = base64.b64encode(
+                    rsa.sign(raw_data_to_be_encrypted.encode(), private_key, 'SHA-256')).decode()
+
+                try:
+                    complete_response = self.client.post(
+                        f"{base_url}/api/dfs/check-out/complete/{payment_reference_id}",
+                        headers=headers,
+                        json={
+                            'sensitiveData': sensitive_data,
+                            'signature': signature,
+                            'merchantCallbackURL': 'https://www.callBackUrlFlutter.com/',
+                            'additionalMerchantInfo': self.additional_merchant_info
+                        }
+                    )
+                except requests.RequestException as e:
+                    raise Exception(f"Exception in Check Out Complete API {e}")
+
+                if complete_response.status_code == 200:
+                    return complete_response.json()
+                else:
+                    raise Exception(
+                        f"Check Out Complete API failed with status: {complete_response.status_code}, message: {complete_response.text}")
+            else:
+                raise Exception("Signature Verification Failed")
         else:
-            print(f"Error: Received status code {response.status_code}")
-            print(f"Response text: {response.text}")
-            return {"error": f"Failed with status code {response.status_code}"}
+            raise Exception(
+                f"Check Out Initialize API failed with status: {response.status_code}, message: {response.text}")
 
-    def complete_payment(self, payment_ref_id, amount):
-        """Complete the payment by sending order details."""
-        sensitive_data = {
-            "merchantId": self.merchant_id,
-            "orderId": "order123",
-            "amount": amount,
-            "currencyCode": "050",  # BDT
-            "challenge": "challenge_from_initialization_response"
-        }
+    def generate_random_string(self, size, seed):
+        random.seed(int.from_bytes(seed, "big"))
+        return ''.join(random.choices("0123456789abcdef", k=size))
 
-        encrypted_data = encrypt_sensitive_data(str(sensitive_data))
-        signature = sign_sensitive_data(str(sensitive_data))
-
-        payload = {
-            "sensitiveData": encrypted_data,
-            "signature": signature,
-            "merchantCallbackURL": settings.NAGAD_CALLBACK_URL,
-            "additionalMerchantInfo": {
-                "productName": "T-shirt",
-                "productCount": 1
-            }
-        }
-
-        response = requests.post(
-            f"{self.base_url}check-out/complete/{payment_ref_id}",
-            json=payload,
-            headers={"Content-Type": "application/json"}
-        )
-        return response.json()
-
-    def check_payment_status(self, payment_ref_id):
-        """Check the status of a payment."""
-        response = requests.get(
-            f"{self.base_url}verify/payment/{payment_ref_id}",
-            headers={"Content-Type": "application/json"}
-        )
-        return response.json()
+    def get_ip_address(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        try:
+            s.connect(('10.254.254.254', 1))
+            ip_address = s.getsockname()[0]
+        except Exception:
+            ip_address = '127.0.0.1'
+        finally:
+            s.close()
+        return ip_address
