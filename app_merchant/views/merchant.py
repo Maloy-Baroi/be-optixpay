@@ -106,7 +106,9 @@ class VerifyMerchantView(APIView):
             api_key = request.data.get('api_key')
             secret_key = request.data.get('secret_key')
             payment_method = request.data.get('payment_method')
+            print(f"API_KEY: {api_key}, SECRET_KEY: {secret_key}, PAYMENT_METHOD: {payment_method}")
             merchant = Merchant.objects.get(api_key=api_key, secret_key=secret_key)
+            print(merchant)
 
             if merchant:
                 # Fetch a payment aggregator agent that supports the provided payment_method (provider)
@@ -114,13 +116,20 @@ class VerifyMerchantView(APIView):
                     providers__is_active=True
                 ).values_list('id', flat=True)
 
+                print(selected_agent_ids)
+
                 selected_agent_id = random.choice(selected_agent_ids)
+
+                print(selected_agent_id)
 
                 selected_agent = PaymentAggregatorAgent.objects.get(id=selected_agent_id)
 
+                print(selected_agent)
+
                 if selected_agent:
                     # Retrieve provider for the specific payment_method
-                    provider = selected_agent.providers.all().filter(provider__iexact=payment_method)
+                    provider = selected_agent.providers.all().filter(provider=payment_method)
+                    print(provider)
 
                     if provider.exists():
                         # Safe to access the first element as the queryset is not empty

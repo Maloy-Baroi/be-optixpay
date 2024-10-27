@@ -10,7 +10,7 @@ from core.models.base_model import BaseModel
 # Payment Providers (e.g., Stripe, bKash, PayPal)
 class PaymentProvider(BaseModel):
     PROVIDER_CHOICES = [
-        ('bKash', 'bKash'),
+        ('bkash', 'BKash'),
         ('nagad', 'Nagad'),
         ('stripe', 'Stripe'),
         ('paypal', 'PayPal'),
