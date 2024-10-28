@@ -12,11 +12,25 @@ class Payment(BaseModel, HistoryMixin):
         ('rejected', 'rejected'),
         ('failed', 'failed'),
     ]
+
+    TRANSACTION_TYPE = [
+        ('prepayment', 'Prepayment'),
+        ('deposit', 'Deposit'),
+        ('withdraw', 'Withdraw'),
+    ]
+
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE)
     paymentID = models.CharField(max_length=100, unique=True, null=True, blank=True)  # Assuming paymentID is unique
     paymentMethod = models.CharField(max_length=50, null=True, blank=True)
     trxID = models.CharField(max_length=100, unique=True, null=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_type = models.CharField(max_length=50, null=True, blank=True, choices=TRANSACTION_TYPE, default='prepayment')
+
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    in_bdt = models.DecimalField(max_digits=10, decimal_places=2, null=True, default=0.0)
+    commission = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    after_commission = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
     currency = models.CharField(max_length=10, null=True, blank=True)
     intent = models.CharField(max_length=50, null=True, blank=True)
     merchantInvoiceNumber = models.CharField(max_length=100, null=True, blank=True)

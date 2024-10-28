@@ -67,9 +67,23 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name='user permissions',
     )
 
-    # def save(self, *args, **kwargs):
-    #     if not self._state.adding and self.password != self.__class__.objects.get(pk=self.pk).password:
-    #         self.set_password(self.password)
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        # Check if the password needs to be hashed
+        if self._password_is_plain(self.password):
+            self.set_password(self.password)
+        super().save(*args, **kwargs)
+
+    def _password_is_plain(self, password):
+        """
+        Helper method to check if a password is already hashed.
+        Django hashed passwords start with a hash identifier.
+        """
+        return not password.startswith("pbkdf2_") and not password.startswith("argon2$")
+
+    def set_password(self, raw_password):
+        """
+        Sets the user’s password to the given raw string, taking care of the hashing.
+        """
+        super().set_password(raw_password)
 
 

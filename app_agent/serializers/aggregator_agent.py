@@ -20,3 +20,20 @@ class PaymentAggregatorAgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentAggregatorAgent
         fields = ['agent_profile']
+
+
+class PaymentProviderCreateListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentProvider
+        fields = [
+            'bank_id',
+            'name',
+            'provider',
+            'phone_number',
+            'trx_type',
+            'password',
+            'api_key',
+            'secret_key',
+            'is_active'
+        ]
+

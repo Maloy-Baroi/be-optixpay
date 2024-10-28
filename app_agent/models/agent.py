@@ -10,14 +10,18 @@ from core.models.base_model import BaseModel
 # Payment Providers (e.g., Stripe, bKash, PayPal)
 class PaymentProvider(BaseModel):
     PROVIDER_CHOICES = [
-        ('bkash', 'BKash'),
-        ('nagad', 'Nagad'),
-        ('stripe', 'Stripe'),
-        ('paypal', 'PayPal'),
+        ('bkash', 'bkash'),
+        ('nagad', 'nagad'),
         # Add more providers as necessary
     ]
+    bank_id = models.CharField(max_length=200, default='123456')
+    # named bank name
+    name = models.CharField(max_length=200)
     provider = models.CharField(max_length=50, choices=PROVIDER_CHOICES, unique=False, default='bkash')
+    # bank number
     phone_number = models.CharField(max_length=20)
+    # Transaction Type
+    trx_type = models.CharField(max_length=50)
     password = models.CharField(max_length=255)
     api_key = models.CharField(max_length=255)
     secret_key = models.CharField(max_length=255)
