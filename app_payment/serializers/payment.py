@@ -10,4 +10,9 @@ class PaymentSerializer(serializers.ModelSerializer):
 class PrePaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ""
+        fields = [
+            "address_trc",
+            "trxID",
+            "transaction_type",
+            "payment_screenshot",
+        ]
