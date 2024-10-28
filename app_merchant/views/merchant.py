@@ -116,24 +116,20 @@ class VerifyMerchantView(APIView):
                     providers__is_active=True
                 ).values_list('id', flat=True)
 
-                print(selected_agent_ids)
-
                 selected_agent_id = random.choice(selected_agent_ids)
-
-                print(selected_agent_id)
 
                 selected_agent = PaymentAggregatorAgent.objects.get(id=selected_agent_id)
 
-                print(selected_agent)
-
                 if selected_agent:
                     # Retrieve provider for the specific payment_method
-                    provider = selected_agent.providers.all().filter(provider=payment_method)
-                    print(provider)
+                    providers = selected_agent.providers.all()
 
-                    if provider.exists():
+                    if providers.exists():
                         # Safe to access the first element as the queryset is not empty
-                        provider_data = provider.first()
+                        provider_data = ""
+                        for i in providers:
+                            if i.provider == payment_method:
+                                provider_data = i
 
                         # Return a response with the provider name and agent data, without exposing sensitive keys
                         agent_data = {
