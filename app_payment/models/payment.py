@@ -1,6 +1,7 @@
 from django.db import models
 
 from app_merchant.models.merchant import Merchant
+from app_payment.models.crypto_address_trc import CryptoAddressTRC
 from core.models.base_model import BaseModel
 from core.models.history_model import HistoryMixin
 
@@ -19,6 +20,8 @@ class Payment(BaseModel, HistoryMixin):
         ('withdraw', 'Withdraw'),
     ]
 
+    # Crypto Address
+    address_trc = models.ForeignKey(CryptoAddressTRC, on_delete=models.SET_NULL, null=True, blank=True, related_name='payment_address_trc')
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE)
     paymentID = models.CharField(max_length=100, unique=True, null=True, blank=True)  # Assuming paymentID is unique
     paymentMethod = models.CharField(max_length=50, null=True, blank=True)
@@ -39,6 +42,8 @@ class Payment(BaseModel, HistoryMixin):
     customerMsisdn = models.CharField(max_length=15, null=True, blank=True)
     payerAccount = models.CharField(max_length=15, null=True, blank=True)
     status = models.CharField(max_length=255, choices=STATUS_CHOICES, default="pending")
+
+    payment_screenshot = models.ImageField(null=True, blank=True, upload_to="payment/screenshots")
 
     def __str__(self):
         return f"Payment {self.paymentID} - Status: {self.status}"

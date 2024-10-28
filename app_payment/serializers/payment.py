@@ -6,3 +6,8 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = '__all__'  # Include all fields from the Payment model
+
+class PrePaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ""
