@@ -34,6 +34,16 @@ class PaymentProviderCreateListSerializer(serializers.ModelSerializer):
             'password',
             'api_key',
             'secret_key',
+            'minimum_transaction_amount',
+            'maximum_transaction_amount',
+            'assigned',
             'is_active'
         ]
+
+        extra_kwargs = {
+            'bank_id': {'read_only': True},
+            'assigned': {'read_only': True},
+            'is_active': {'read_only': True},
+        }
+
 

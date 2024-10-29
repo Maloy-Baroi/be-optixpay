@@ -25,6 +25,9 @@ class PaymentProvider(BaseModel):
     password = models.CharField(max_length=255)
     api_key = models.CharField(max_length=255)
     secret_key = models.CharField(max_length=255)
+    minimum_transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    maximum_transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    assigned = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)  # To toggle active status of provider
 
     def __str__(self):
