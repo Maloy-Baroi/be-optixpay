@@ -21,9 +21,8 @@ class PaymentProviderListCreateAPIView(APIView):
     def post(self, request):
         # Create a new payment provider
         serializer = PaymentProviderCreateListSerializer(data=request.data)
-        bank_id = f"ag-{uuid.uuid4()}"
         if serializer.is_valid():
-            serializer.save(bank_id=bank_id, assign=False, is_active=True)
+            serializer.save(assign=False, is_active=True)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
