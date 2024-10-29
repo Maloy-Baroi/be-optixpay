@@ -46,4 +46,9 @@ class PaymentProviderCreateListSerializer(serializers.ModelSerializer):
             'is_active': {'read_only': True},
         }
 
+    def create(self, validated_data):
+        # Exclude `bank_id` since it has a default value and should not be manually set
+        validated_data.pop('bank_id', None)
+        return super().create(validated_data)
+
 
