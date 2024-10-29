@@ -8,6 +8,8 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = '__all__'  # Include all fields from the Payment model
 
 class PrePaymentSerializer(serializers.ModelSerializer):
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
     class Meta:
         model = Payment
         fields = [
@@ -15,4 +17,27 @@ class PrePaymentSerializer(serializers.ModelSerializer):
             "trxID",
             "transaction_type",
             "payment_screenshot",
+            "amount"
         ]
+
+    def validate_amount(self, value):
+        # Add any custom validation logic here
+        if float(value) <= 0.0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
+        return value
+
+class PrePaymentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = '__all__'  # Include all fields from the Payment model
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        return {
+            "address_trc": ret["address_trc"],
+            "OrderId": ret["trxID"],
+            "transaction_type": ret["transaction_type"],
+            "payment_screenshot": ret["payment_screenshot"],
+            "amount": ret["amount"],
+            "amount_in_bdt": ret["in_bdt"]
+        }

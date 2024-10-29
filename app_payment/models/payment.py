@@ -22,7 +22,7 @@ class Payment(BaseModel, HistoryMixin):
 
     # Crypto Address
     address_trc = models.ForeignKey(CryptoAddressTRC, on_delete=models.SET_NULL, null=True, blank=True, related_name='payment_address_trc')
-    merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE)
+    merchant = models.ForeignKey(Merchant, on_delete=models.SET_NULL, null=True, blank=True, related_name='payment_merchant')
     paymentID = models.CharField(max_length=100, unique=True, null=True, blank=True)  # Assuming paymentID is unique
     paymentMethod = models.CharField(max_length=50, null=True, blank=True)
     trxID = models.CharField(max_length=100, unique=True, null=True)
