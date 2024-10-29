@@ -1,5 +1,3 @@
-import uuid
-
 from django.db import models
 from django.utils import timezone
 from decimal import Decimal
@@ -16,7 +14,7 @@ class PaymentProvider(BaseModel):
         ('nagad', 'nagad'),
         # Add more providers as necessary
     ]
-    bank_id = models.CharField(max_length=200, default=f"ag-{uuid.uuid4()}")
+    bank_id = models.CharField(max_length=200, default='ag-123456')
     # named bank name
     name = models.CharField(max_length=200)
     provider = models.CharField(max_length=50, choices=PROVIDER_CHOICES, unique=False, default='bkash')
