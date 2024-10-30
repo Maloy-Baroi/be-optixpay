@@ -15,6 +15,7 @@ class PaymentListAPIView(APIView):
     def get(self, request):
         date_from = request.query_params.get('date_from', None)
         date_to = request.query_params.get('date_to', None)
+        payment_type = request.query_params.get('payment_type', None)
         user = request.user
         user_group = user.groups.all()
         if user_group and "agent" in user_group:
@@ -26,6 +27,14 @@ class PaymentListAPIView(APIView):
 
         if date_from and date_to:
             payments = payments.filter(updated_at__gte=date_from, updated_at__lte=date_to)
+
+        if payment_type == 'deposit':
+            payments = payments.filter(transaction_type='deposit')
+        elif payment_type == 'withdraw':
+            payments = payments.filter(transaction_type='withdraw')
+        elif payment_type == 'prepayment':
+            payments = payments.filter(transaction_type='prepayment')
+
         serializer = PaymentSerializer(payments, many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 

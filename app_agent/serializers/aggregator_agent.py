@@ -54,3 +54,7 @@ class PaymentProviderCreateListSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class PaymentProviderUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentProvider
+        fields = '__all__'
