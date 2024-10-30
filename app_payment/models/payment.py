@@ -21,12 +21,15 @@ class Payment(BaseModel, HistoryMixin):
     ]
 
     # Crypto Address
-    address_trc = models.ForeignKey(CryptoAddressTRC, on_delete=models.SET_NULL, null=True, blank=True, related_name='payment_address_trc')
-    merchant = models.ForeignKey(Merchant, on_delete=models.SET_NULL, null=True, blank=True, related_name='payment_merchant')
+    address_trc = models.ForeignKey(CryptoAddressTRC, on_delete=models.SET_NULL, null=True, blank=True,
+                                    related_name='payment_address_trc')
+    merchant = models.ForeignKey(Merchant, on_delete=models.SET_NULL, null=True, blank=True,
+                                 related_name='payment_merchant')
     paymentID = models.CharField(max_length=100, unique=True, null=True, blank=True)  # Assuming paymentID is unique
     paymentMethod = models.CharField(max_length=50, null=True, blank=True)
     trxID = models.CharField(max_length=100, unique=True, null=True)
-    transaction_type = models.CharField(max_length=50, null=True, blank=True, choices=TRANSACTION_TYPE, default='prepayment')
+    transaction_type = models.CharField(max_length=50, null=True, blank=True, choices=TRANSACTION_TYPE,
+                                        default='prepayment')
 
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     in_bdt = models.DecimalField(max_digits=10, decimal_places=2, null=True, default=0.0)
