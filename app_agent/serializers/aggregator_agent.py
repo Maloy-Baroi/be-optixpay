@@ -26,6 +26,7 @@ class PaymentProviderCreateListSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentProvider
         fields = [
+            'id',
             'bank_id',
             'name',
             'provider',
@@ -41,6 +42,7 @@ class PaymentProviderCreateListSerializer(serializers.ModelSerializer):
         ]
 
         extra_kwargs = {
+            'id': {'read_only': True},
             'bank_id': {'read_only': True},
             'assigned': {'read_only': True},
             'is_active': {'read_only': True},
