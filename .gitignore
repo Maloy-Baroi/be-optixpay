@@ -1,8 +1,7 @@
-  GNU nano 7.2                                                                      .gitignore                                                                              .env
 venv
 
 *.pyc*
-
+.env
 package.json
 pnpm-loc.yaml
 
