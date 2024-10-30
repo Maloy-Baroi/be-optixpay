@@ -1,4 +1,4 @@
-.env
+  GNU nano 7.2                                                                      .gitignore                                                                              .env
 venv
 
 *.pyc*
@@ -7,3 +7,7 @@ package.json
 pnpm-loc.yaml
 
 .idea
+docker-compose.yml
+*/migrations/*.py
+db.sqlite3
+media/*
