@@ -58,7 +58,6 @@ AUTH_USER_MODEL = 'app_auth.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'simple_history.middleware.HistoryRequestMiddleware',
@@ -175,7 +174,7 @@ STATIC_URL = '/static/'
 #     BASE_DIR / "static",  # If you have custom static files
 # ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # This is the directory where collected static files will be stored
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
