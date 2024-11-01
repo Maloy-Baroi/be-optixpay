@@ -7,6 +7,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = '__all__'  # Include all fields from the Payment model
 
+
 class PrePaymentSerializer(serializers.ModelSerializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2)
 
@@ -26,6 +27,7 @@ class PrePaymentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Amount must be greater than zero.")
         return value
 
+
 class PrePaymentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
@@ -41,3 +43,15 @@ class PrePaymentListSerializer(serializers.ModelSerializer):
             "amount": ret["amount"],
             "amount_in_bdt": ret["in_bdt"]
         }
+
+
+class PaymentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = [
+            'paymentMethod', 'trxID', 'transaction_type', 'amount', 'commission', 'after_commission',
+            'balance', 'currency', 'intent', 'merchantInvoiceNumber', 'payerType', 'payerReference',
+            'customerMsisdn', 'payerAccount', 'status', 'payment_screenshot'
+        ]
+        extra_kwargs = {field: {'required': False} for field in fields}
+
