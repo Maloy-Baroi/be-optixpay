@@ -43,14 +43,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 #     user.save()
 
                 # Get user groups
-                groups = user.groups.all().values_list('name', flat=True)
+                groups = [i.name for i in user.groups.all()]
                 permissions = user.user_permissions.all()
 
                 # permission_serializers = PermissionSerializer(permissions, many=True)
                 return Response({
                     'refresh': str(refresh),
                     'access': access_token,
-                    'groups': list(groups),
+                    'groups': groups,
                     # 'permissions': permission_serializers
                 }, status=status.HTTP_200_OK)
                 # If password is correct, proceed to issue the token
