@@ -27,5 +27,5 @@ urlpatterns = [
     path('exchange-rates/<str:from_currency>/<str:to_currency>/', CurrencyExchangeRateAPIView.as_view(), name='currency_exchange_rate_detail'),  # For retrieving, updating, and deleting a specific exchange rate
     path('deposits/', DepositPaymentsAPIView.as_view(), name='deposit-payments'),
     path('withdraws/', WithdrawPaymentsAPIView.as_view(), name='deposit-payments'),
-    path('withdraw-update/', WithdrawUpdatePaymentsUpdateAPIView.as_view(), name='deposit-payments'),
+    path('withdraw-update/<int:payment_id>/', WithdrawUpdatePaymentsUpdateAPIView.as_view(), name='deposit-payments'),
 ]

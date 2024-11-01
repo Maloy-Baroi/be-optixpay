@@ -48,8 +48,7 @@ class PrePaymentListSerializer(serializers.ModelSerializer):
 class PaymentUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = [
-            'paymentMethod', 'trxID', 'transaction_type', 'amount', 'commission', 'after_commission',
+        fields = ['trxID', 'transaction_type', 'amount', 'commission', 'after_commission',
             'balance', 'currency', 'intent', 'merchantInvoiceNumber', 'payerType', 'payerReference',
             'customerMsisdn', 'payerAccount', 'status', 'payment_screenshot'
         ]

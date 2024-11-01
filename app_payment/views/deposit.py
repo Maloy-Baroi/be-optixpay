@@ -37,11 +37,12 @@ class WithdrawPaymentsAPIView(APIView):
 
 
 class WithdrawUpdatePaymentsUpdateAPIView(APIView):
-    permission_classes = [IsAuthenticated]  # Assuming you require authentication
+    # permission_classes = [IsAuthenticated]  # Assuming you require authentication
 
     def patch(self, request, payment_id):
         try:
             payment = Payment.objects.get(id=payment_id)
+            print("Payment: ", payment)
         except Payment.DoesNotExist:
             return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
 
