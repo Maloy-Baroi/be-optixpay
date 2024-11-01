@@ -14,6 +14,8 @@ from services.admin_checker import IsSuperAdmin
 
 
 class CreateUserAndMerchantAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+
     @transaction.atomic
     def post(self, request):
         user_data = request.data.get('user')
@@ -32,7 +34,7 @@ class CreateUserAndMerchantAPIView(APIView):
             merchant_serializer = MerchantSerializer(data=merchant_data)
 
             if merchant_serializer.is_valid():
-                merchant_serializer.save()
+                merchant_serializer.save(is_active='active')
                 return Response({
                     "user": user_serializer.data,
                     "merchant": merchant_serializer.data
@@ -53,7 +55,7 @@ class MerchantCreateAPIView(APIView):
     def post(self, request):
         serializer = MerchantSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(is_active=True)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

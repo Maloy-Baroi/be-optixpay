@@ -21,7 +21,7 @@ class PrePaymentCreateListAPIView(APIView):
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, *args, **kwargs):
-        data = request.data['payload'].copy()  # Copy the request data to make it mutable
+        data = request.data.copy()  # Copy the request data to make it mutable
 
         # Handle base64 encoded image if present
         payment_screenshot_data = data.get('payment_screenshot')

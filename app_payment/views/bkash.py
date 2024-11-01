@@ -24,8 +24,6 @@ class DepositBKashPayView(APIView):
         secret_key = request.data.get('secret_key')
         merchant = request.data.get('merchant')
 
-        print(f"app_key: {app_key}, \nsecret_key: {secret_key}, \nmerchant: {merchant}")
-
         merchant = Merchant.objects.get(id=int(merchant))
 
         username = request.data.get('username')

@@ -3,6 +3,7 @@ from django.urls import path
 from app_payment.views.bkash import DepositBKashPayView, BkashPaymentInitiateAPIView, BkashPaymentExecuteAPIView
 from app_payment.views.crypto_address_trc import CryptoAddressDetailAPIView
 from app_payment.views.currency_exchange_rate import CurrencyExchangeRateAPIView
+from app_payment.views.deposit import DepositPaymentsAPIView
 from app_payment.views.nagad import StartPaymentView
 from app_payment.views.payment_details import PaymentListAPIView
 from app_payment.views.prepayment import PrePaymentCreateListAPIView
@@ -23,4 +24,5 @@ urlpatterns = [
     path('prepayment/', PrePaymentCreateListAPIView.as_view(), name='prepayment-create'),
 
     path('exchange-rates/<str:from_currency>/<str:to_currency>/', CurrencyExchangeRateAPIView.as_view(), name='currency_exchange_rate_detail'),  # For retrieving, updating, and deleting a specific exchange rate
+    path('deposits/', DepositPaymentsAPIView.as_view(), name='deposit-payments'),
 ]
