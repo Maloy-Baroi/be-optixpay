@@ -203,7 +203,7 @@ class BkashPaymentExecuteAPIView(APIView):
                 payment_obj.customerMsisdn = response.json().get('customerMsisdn')
                 payment_obj.payerAccount = response.json().get('payerAccount')
                 payment_obj.status = response.json().get('statusMessage').lower()
-
+                payment_obj.transaction_type = 'deposit'
                 payment_obj.save()
 
                 return Response({"data": response.json()}, status=status.HTTP_200_OK)
