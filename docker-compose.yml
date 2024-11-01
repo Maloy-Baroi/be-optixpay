@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: optix_pay
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - ./staticfiles:/app/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=optixpay_backend.settings
+      - DEBUG=1
+      - DJANGO_SECRET_KEY=yd2f8slb8^+vrm3rb%9&!q=-$z1x5cq80ulqyb1_c3$yxl@=2b
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - DATABASE_NAME=optix_db
+      - DATABASE_USER=optixpay
+      - DATABASE_PASSWORD=optix_pay_123
+      - DATABASE_HOST=147.79.66.187
+      - DATABASE_PORT=5432
+    depends_on:
+      - db
+      - redis
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=optix_db
+      - POSTGRES_USER=optixpay
+      - POSTGRES_PASSWORD=optix_pay_123
+
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
