@@ -58,3 +58,13 @@ class PaymentProviderUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentProvider
         fields = '__all__'
+
+
+class AgentProfileListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgentProfile
+        fields = [
+            'id', 'user', 'full_name', 'email', 'date_of_birth', 'phone_number',
+            'nationality', 'nid_number', 'telegram_account', 'verification_type',
+            'front_side_document', 'back_side_document', 'selfie_with_document'
+        ]
