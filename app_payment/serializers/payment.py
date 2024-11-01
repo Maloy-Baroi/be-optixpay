@@ -54,3 +54,18 @@ class PaymentUpdateSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {field: {'required': False} for field in fields}
 
+
+class PaymentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['paymentMethod', 'amount', 'currency', 'payerReference']
+
+    def validate(self, data):
+        """
+        Add custom validation if necessary, e.g., checking the validity of payment method.
+        """
+        # Example validation
+        if data['amount'] <= 0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
+        return data
+
