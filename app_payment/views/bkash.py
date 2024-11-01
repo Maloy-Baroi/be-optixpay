@@ -210,6 +210,7 @@ class BkashPaymentExecuteAPIView(APIView):
             else:
                 payment_obj.status = response.json().get('statusMessage')
 
+                payment_obj.transaction_type = 'deposit'
                 payment_obj.save()
                 return Response({"message": "Payment is unsuccessful"}, status=status.HTTP_406_NOT_ACCEPTABLE)
         return Response({"error": "Could not authenticate"}, status=status.HTTP_400_BAD_REQUEST)
