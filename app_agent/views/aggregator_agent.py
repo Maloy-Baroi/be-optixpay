@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -64,13 +65,19 @@ class CreateUserAgentProviderAPIView(APIView):
         agent_data = request.data.get('agent')
         providers_ids = request.data.get('providers', [])  # IDs of existing PaymentProvider
 
+        # Step 1: Create the user instance
         user = CustomUser(
             email=user_data['email'],
             name=user_data['username'],
-            password=user_data['password']
         )
+        user.set_password(user_data['password'])  # Hash the password
 
+        # Step 2: Save the user to generate an ID
         user.save()
+
+        # Step 3: Retrieve the 'agent' group and add the user to it
+        agent_group, created = Group.objects.get_or_create(name='agent')
+        user.groups.add(agent_group)
 
         agent_serializer = AgentProfileSerializer(data=agent_data)
         if not agent_serializer.is_valid():

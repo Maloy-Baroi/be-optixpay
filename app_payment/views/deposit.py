@@ -1,8 +1,11 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app_agent.models.agent import PaymentAggregatorAgent
+from app_auth.models.agent_profile import AgentProfile
 from app_merchant.models.merchant import Merchant
 from app_payment.models.payment import Payment
 from app_payment.serializers.payment import PaymentSerializer, PaymentUpdateSerializer
@@ -26,14 +29,22 @@ class WithdrawPaymentsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        user = request.user
-        group = request.query_params.get('group', None)
-        deposits = Payment.objects.filter(transaction_type='withdraw')
-        # if group and group=='merchant':
-        #     merchant = Merchant.objects.get(pk=request.user)
+        try:
+            user = request.user
+            agent_profile = AgentProfile.objects.get(user=user)
+            aggregator = PaymentAggregatorAgent.objects.get(agent_profile=agent_profile)
+            banks = aggregator.providers.all()
+            phone_numbers = [bank.phone_number for bank in banks]
+            print(phone_numbers)
+            group = request.query_params.get('group', None)
+            withdraws = Payment.objects.filter(transaction_type='withdraw')
+            if group and group != 'admin':
+                withdraws = withdraws.filter(payerReference="")
 
-        serializer = PaymentSerializer(deposits, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = PaymentSerializer(withdraws, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({"message": "No data found!"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class WithdrawUpdatePaymentsUpdateAPIView(APIView):
