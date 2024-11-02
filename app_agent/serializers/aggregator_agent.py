@@ -73,7 +73,6 @@ class AgentProfileListSerializer(serializers.ModelSerializer):
 
     def get_agent_bank_details(self, obj):
         obj_id = obj.id
-        print("object id: ", obj_id)
         providers = PaymentAggregatorAgent.objects.filter(agent_profile=obj_id)
         all_providers = []
         for provider in providers:
