@@ -14,7 +14,7 @@ from services.admin_checker import IsSuperAdmin
 
 
 class CreateUserAndMerchantAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @transaction.atomic
     def post(self, request):
@@ -46,7 +46,7 @@ class CreateUserAndMerchantAPIView(APIView):
 
 
 class MerchantCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         queryset = Merchant.objects.all()
@@ -62,7 +62,7 @@ class MerchantCreateAPIView(APIView):
 
 
 class MerchantRetrieveAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -74,7 +74,7 @@ class MerchantRetrieveAPIView(APIView):
 
 
 class MerchantUpdateAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    # permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
         try:
@@ -89,7 +89,7 @@ class MerchantUpdateAPIView(APIView):
 
 
 class MerchantDestroyAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    # permission_classes = [IsAuthenticated]
 
     def delete(self, request, pk):
         try:

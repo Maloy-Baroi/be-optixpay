@@ -34,7 +34,7 @@ def generate_unique_filename(original_filename):
 
 
 class AgentProfileCreateAPI(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         # Initialize a dictionary to hold potential file data
@@ -67,7 +67,7 @@ class AgentProfileCreateAPI(APIView):
 
 # Retrieve API View
 class AgentProfileRetrieveAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(operation_description="Retrieve an Agent Profile")
     def get(self, request, pk, *args, **kwargs):
@@ -77,7 +77,7 @@ class AgentProfileRetrieveAPIView(APIView):
 
 # Update API View
 class AgentProfileUpdateAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def put(self, request, pk, *args, **kwargs):
         profile = get_object_or_404(AgentProfile, pk=pk)

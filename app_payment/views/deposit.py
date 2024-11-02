@@ -12,7 +12,7 @@ from app_payment.serializers.payment import PaymentSerializer, PaymentUpdateSeri
 
 
 class DepositPaymentsAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -26,7 +26,7 @@ class DepositPaymentsAPIView(APIView):
 
 
 class WithdrawPaymentsAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         try:

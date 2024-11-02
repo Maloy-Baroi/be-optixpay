@@ -6,7 +6,7 @@ from app_auth.serializers.wallet import WalletSerializer
 class WalletViewSet(viewsets.ModelViewSet):
     queryset = Wallet.objects.all()
     serializer_class = WalletSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         # Optionally filter wallets by the logged-in user

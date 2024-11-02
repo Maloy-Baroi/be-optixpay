@@ -9,7 +9,7 @@ from services.admin_checker import IsSuperAdmin
 
 
 class CurrencyListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         currencies = Currency.objects.all()
@@ -25,7 +25,7 @@ class CurrencyListCreateAPIView(APIView):
 
 
 class CurrencyRetrieveUpdateDestroyAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         return get_object_or_404(Currency, pk=pk)
