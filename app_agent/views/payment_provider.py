@@ -46,6 +46,7 @@ class PaymentProviderDetailAPIView(APIView):
 
     def patch(self, request, pk):
         # Update an existing payment provider
+        print('Provider Id:', pk)
         provider = self.get_object(pk)
         serializer = PaymentProviderUpdateSerializer(provider, data=request.data, partial=True)
         if serializer.is_valid():

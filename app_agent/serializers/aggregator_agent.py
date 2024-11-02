@@ -61,10 +61,25 @@ class PaymentProviderUpdateSerializer(serializers.ModelSerializer):
 
 
 class AgentProfileListSerializer(serializers.ModelSerializer):
+    agent_bank_details = serializers.SerializerMethodField()
     class Meta:
         model = AgentProfile
         fields = [
             'id', 'user', 'full_name', 'email', 'date_of_birth', 'phone_number',
             'nationality', 'nid_number', 'telegram_account', 'verification_type',
-            'front_side_document', 'back_side_document', 'selfie_with_document'
+            'front_side_document', 'back_side_document', 'selfie_with_document',
+            'agent_bank_details'
         ]
+
+    def get_agent_bank_details(self, obj):
+        obj_id = obj.id
+        print("object id: ", obj_id)
+        providers = PaymentAggregatorAgent.objects.filter(agent_profile=obj_id)
+        all_providers = []
+        for provider in providers:
+            banks = provider.providers.all()
+            bank_serializer = PaymentProviderCreateListSerializer(banks, many=True)
+            all_providers.append(bank_serializer.data)
+
+        return all_providers
+
