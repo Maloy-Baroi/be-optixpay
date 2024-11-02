@@ -135,7 +135,7 @@ BKASH_APP_KEY = 'E8QGBD19aGNfjYVmKgqfo9f1tc'
 BKASH_APP_SECRET = 'tXTvohbA80UW0qtQazY2xGrEMuxW9uBto7oiwpJQWptFGXOR4gyZ'
 BKASH_USERNAME = '01945503874'
 BKASH_PASSWORD = '4CSX@Wr[I7B'
-BKASH_BASE_URL = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/'
+BKASH_BASE_URL = 'https://tokenized.pay.bka.sh/v1.2.0-beta/'
 
 # Path to the root directory
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

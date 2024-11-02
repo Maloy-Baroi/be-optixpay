@@ -47,8 +47,14 @@ class DepositBKashPayView(APIView):
 
         try:
             # Make the request to the external API using requests
+            # response = requests.post(
+            #     "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/token/grant",
+            #     json=data,
+            #     headers=headers
+            # )
+            # Make the request to the external API using requests
             response = requests.post(
-                "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/token/grant",
+                "https://tokenized.pay.bka.sh/v1.2.0-beta/tokenized/checkout/token/grant",
                 json=data,
                 headers=headers
             )
