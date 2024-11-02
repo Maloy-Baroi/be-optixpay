@@ -51,6 +51,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     'refresh': str(refresh),
                     'access': access_token,
                     'groups': groups,
+                    'username': user.name
                     # 'permissions': permission_serializers
                 }, status=status.HTTP_200_OK)
                 # If password is correct, proceed to issue the token

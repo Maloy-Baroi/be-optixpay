@@ -18,29 +18,31 @@ class CreateUserAndMerchantAPIView(APIView):
 
     @transaction.atomic
     def post(self, request):
-        user_data = request.data.get('user')
-        merchant_data = request.data.get('merchant')
+        try:
+            user_data = request.data.get('user')
+            merchant_data = request.data.get('merchant')
 
-        # Serialize and validate user data
-        user_serializer = CustomUserSerializer(data=user_data)
-        if user_serializer.is_valid():
-            # Set hashed password
-            user_serializer.validated_data['password'] = make_password(user_serializer.validated_data['password'])
-            user = user_serializer.save()
+            # Serialize and validate user data
+            user_serializer = CustomUserSerializer(data=user_data)
+            if user_serializer.is_valid():
+                # Set hashed password
+                user_serializer.validated_data['password'] = make_password(user_serializer.validated_data['password'])
+                user = user_serializer.save()
 
-            # Set the user reference in merchant data
-            merchant_data['user'] = user.id
-            merchant_serializer = MerchantSerializer(data=merchant_data)
+                # Set the user reference in merchant data
+                merchant_data['user'] = user.id
+                merchant_serializer = MerchantSerializer(data=merchant_data)
 
-            if merchant_serializer.is_valid():
-                merchant_serializer.save(is_active='active')
-                return Response({
-                    "user": user_serializer.data,
-                    "merchant": merchant_serializer.data
-                }, status=status.HTTP_201_CREATED)
-            else:
-                return Response(merchant_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                if merchant_serializer.is_valid():
+                    merchant_serializer.save(is_active='active')
+                    return Response({
+                        "user": user_serializer.data,
+                        "merchant": merchant_serializer.data
+                    }, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(merchant_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MerchantCreateAPIView(APIView):
@@ -107,9 +109,7 @@ class VerifyMerchantView(APIView):
             api_key = request.data.get('api_key')
             secret_key = request.data.get('secret_key')
             payment_method = request.data.get('payment_method')
-            print(f"API_KEY: {api_key}, SECRET_KEY: {secret_key}, PAYMENT_METHOD: {payment_method}")
             merchant = Merchant.objects.get(api_key=api_key, secret_key=secret_key)
-            print(merchant)
 
             if merchant:
                 # Fetch a payment aggregator agent that supports the provided payment_method (provider)
