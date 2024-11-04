@@ -19,7 +19,8 @@ class Nagad:
         self.additional_merchant_info = additional_info
 
     def regular_payment(self, order_id, amount):
-        base_url = "https://sandbox-ssl.mynagad.com" if self.credentials['isSandbox'] else "https://api.mynagad.com"
+        print(f"Is Sandbox: {self.credentials['isSandbox']}")
+        base_url = "https://sandbox-ssl.mynagad.com" if self.credentials['isSandbox'] else "https://payment.mynagad.com:30000"
         kpg_default_seed = f"nagad-dfs-service-ltd{int(datetime.datetime.now().timestamp() * 1000)}"
 
         # Load and convert the public key using cryptography
@@ -86,11 +87,13 @@ class Nagad:
                     'signature': signature,
                 }
             )
+            print("Response: ", response)
         except requests.RequestException as e:
             raise Exception(f"Exception in Check Out Initialize API {e}")
 
         if response.status_code == 200:
             response_body = response.json()
+            print(response_body.get('payment_url'))
             sensitive_data = response_body['sensitiveData']
             signature = response_body['signature']
 

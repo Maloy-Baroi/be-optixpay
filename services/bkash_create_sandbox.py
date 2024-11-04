@@ -1,7 +1,7 @@
 import requests
 import json
 
-url = "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create"
+url = "https://tokenized.pay.bka.sh/v1.2.0-beta/tokenized/checkout/create"
 
 def bkash_create_sandbox(call_back_path, amount, currency, invoice_number, merchant_id, id_token, x_app_key, username):
     try:
