@@ -20,7 +20,7 @@ class Nagad:
 
     def regular_payment(self, order_id, amount):
         print(f"Is Sandbox: {self.credentials['isSandbox']}")
-        base_url = "https://sandbox-ssl.mynagad.com" if self.credentials['isSandbox'] else "https://payment.mynagad.com:30000"
+        base_url = "https://sandbox-ssl.mynagad.com" if self.credentials['isSandbox'] else "https://api.mynagad.com"
         kpg_default_seed = f"nagad-dfs-service-ltd{int(datetime.datetime.now().timestamp() * 1000)}"
 
         # Load and convert the public key using cryptography
@@ -125,7 +125,7 @@ class Nagad:
                         json={
                             'sensitiveData': sensitive_data,
                             'signature': signature,
-                            'merchantCallbackURL': 'https://www.callBackUrlFlutter.com/',
+                            'merchantCallbackURL': 'http://localhost:3000/call-back',
                             'additionalMerchantInfo': self.additional_merchant_info
                         }
                     )

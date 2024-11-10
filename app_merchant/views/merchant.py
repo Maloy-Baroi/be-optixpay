@@ -117,6 +117,8 @@ class VerifyMerchantView(APIView):
                     providers__is_active=True
                 ).values_list('id', flat=True)
 
+                print(f"selected_agent_ids: {selected_agent_ids}")
+
                 selected_agent_id = random.choice(selected_agent_ids)
 
                 selected_agent = PaymentAggregatorAgent.objects.get(id=selected_agent_id)
@@ -126,37 +128,38 @@ class VerifyMerchantView(APIView):
                     providers = selected_agent.providers.all()
 
                     if providers.exists():
-                        # Safe to access the first element as the queryset is not empty
-                        provider_data = ""
+                        provider_data = None
                         for i in providers:
                             if i.provider == payment_method:
                                 provider_data = i
+                                break  # Exit loop once a match is found
 
-                        # Return a response with the provider name and agent data, without exposing sensitive keys
-                        agent_data = {
-                            'id': selected_agent.id,
-                            'agent_name': selected_agent.agent_profile.full_name,
-                            'provider_key': provider_data.api_key,
-                            'provider_secret': provider_data.secret_key,
-                            'provider_phone_number': provider_data.phone_number,
-                            'provider_password': provider_data.password,
-                        }
+                        if provider_data is not None:
+                            # Return a response with the provider name and agent data, without exposing sensitive keys
+                            agent_data = {
+                                'id': selected_agent.id,
+                                'agent_name': selected_agent.agent_profile.full_name,
+                                'provider_key': provider_data.api_key if provider_data.api_key else "",
+                                'provider_secret': provider_data.secret_key if provider_data.secret_key else "",
+                                'provider_phone_number': provider_data.phone_number,
+                                'provider_password': provider_data.password,
+                            }
 
-                        if payment_method.lower() == 'bkash':
-                            return Response({
-                                'message': 'Merchant is verified.',
-                                'agent_data': agent_data,
-                                'my_merxt': merchant.id
-                            }, status=status.HTTP_200_OK)
-                        elif payment_method.lower() == 'nagad':
-                            return Response({
-                                'message': 'Merchant is verified.',
-                                'agent_data': agent_data,
-                                'my_merxt': merchant.id,
-                                'orderId': f"order{random.randint(100000, 9999999999999)}",
-                            }, status=status.HTTP_200_OK)
-                    else:
-                        return Response({'message': f'No provider found for payment method: {payment_method}'}, status=status.HTTP_400_BAD_REQUEST)
+                            if payment_method.lower() == 'bkash':
+                                return Response({
+                                    'message': 'Merchant is verified.',
+                                    'agent_data': agent_data,
+                                    'my_merxt': merchant.id
+                                }, status=status.HTTP_200_OK)
+                            elif payment_method.lower() == 'nagad':
+                                return Response({
+                                    'message': 'Merchant is verified.',
+                                    'agent_data': agent_data,
+                                    'my_merxt': merchant.id,
+                                    'orderId': f"order{random.randint(100000, 9999999999999)}",
+                                }, status=status.HTTP_200_OK)
+                        else:
+                            return Response({'message': f'No provider found for payment method: {payment_method}'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'message': 'Merchant is not verified'}, status=status.HTTP_400_BAD_REQUEST)
         except Merchant.DoesNotExist:

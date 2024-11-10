@@ -63,7 +63,7 @@ class DepositBKashPayView(APIView):
             if response.status_code == 200:
                 response_json = response.json()
                 response_json_dictionary = dict(response_json)
-                id_token = response_json_dictionary['id_token']
+                id_token = response_json_dictionary.get('id_token')
                 if id_token:
                     # sandbox = bkash_create_sandbox(
                     #     call_back_path="http://localhost:3000/",

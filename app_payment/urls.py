@@ -5,7 +5,7 @@ from app_payment.views.crypto_address_trc import CryptoAddressDetailAPIView
 from app_payment.views.currency_exchange_rate import CurrencyExchangeRateAPIView
 from app_payment.views.deposit import DepositPaymentsAPIView, WithdrawPaymentsAPIView, \
     WithdrawUpdatePaymentsUpdateAPIView
-from app_payment.views.nagad import StartPaymentView
+from app_payment.views.nagad import StartPaymentView, CompletePaymentView
 from app_payment.views.payment_details import PaymentListAPIView
 from app_payment.views.prepayment import PrePaymentCreateListAPIView
 from app_payment.views.withdraw import PaymentCreateAPIView
@@ -19,6 +19,7 @@ urlpatterns = [
 
     # Nagad
     path('nagad/create/', StartPaymentView.as_view(), name='start_payment'),
+    path('nagad/complete/', CompletePaymentView.as_view(), name='complete_payment'),
     # path('complete-payment/', CompletePaymentView.as_view(), name='complete_payment'),
     # path('payment-status/<str:payment_ref_id>/', CheckPaymentStatusView.as_view(), name='check_payment_status'),
     path('exchange-rates/', CurrencyExchangeRateAPIView.as_view(), name='currency_exchange_rate_list'),        # For listing and creating exchange rates

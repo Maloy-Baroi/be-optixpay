@@ -5,8 +5,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
-
-from app_payment.models.payment import Payment
 from app_payment.utils import Nagad
 
 # from app_payment.utils import NagadAPIService
@@ -17,8 +15,6 @@ credentials = {
     "pgPublicKey": f"-----BEGIN PUBLIC KEY-----\n{os.getenv('PG_PUBLIC_KEY')}\n-----END PUBLIC KEY-----",
     "merchantPrivateKey": f"-----BEGIN PRIVATE KEY-----\n{os.getenv('MERCHANT_PRIVATE_KEY')}\n-----END PRIVATE KEY-----"
 }
-
-
 # credentials = {
 #     "merchantID": "687456515985399",
 #     "isSandbox": True,
@@ -36,14 +32,6 @@ class StartPaymentView(APIView):
 
             nagad = Nagad(credentials)
             print(f"nagad: {nagad}")
-            payment_obj = Payment(
-                paymentID=order_id,
-                transaction_type="deposit",
-                in_bdt=amount,
-                paymentMethod="nagad",
-                currency="BDT"
-            )
-            payment_obj.save()
             response = nagad.regular_payment(order_id=order_id, amount=amount)
             print(f"response: {response}")
 
@@ -51,18 +39,15 @@ class StartPaymentView(APIView):
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class CompletePaymentView(APIView):
-    def post(self, request):
-        payment_id = request.data.get('payment_id')
-        order_id = request.data.get('order_id')
-
-        payment = Payment.objects.get(paymentID=order_id)
-        payment.trxID = payment_id
-        payment.status = "successful"
-        payment.save()
-
-        return Response({"message": "Successfully Paid"}, status=status.HTTP_200_OK)
+# class CompletePaymentView(APIView):
+#     def post(self, request):
+#         payment_ref_id = request.data.get('payment_ref_id')
+#         amount = request.data.get('amount')
+#
+#         nagad_service = NagadAPIService()
+#         result = nagad_service.complete_payment(payment_ref_id, amount)
+#
+#         return Response(result, status=status.HTTP_200_OK)
 #
 # class CheckPaymentStatusView(APIView):
 #     def get(self, request, payment_ref_id):
