@@ -18,9 +18,16 @@ SECRET_KEY = config('SECRET_KEY', 'yd2f8slb8^+vrm3rb%9&!q=-$z1x5cq80ulqyb1_c3$yx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', 'True') == 'True'
 
-# ALLOWED_HOSTS = []
-
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+if DEBUG:
+    DOMAIN_1 = os.getenv("DOMAIN_1")
+    BACKEND_IP_ADDRESS = os.getenv("BACKEND_IP_ADDRESS")
+    ALLOWED_HOSTS = [
+        f'www.{DOMAIN_1}',
+        DOMAIN_1,
+        BACKEND_IP_ADDRESS
+    ]
+else:
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
 # if 'CODESPACE_NAME' in os.environ:
 #     codespace_name = config("CODESPACE_NAME")
