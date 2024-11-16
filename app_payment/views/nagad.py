@@ -49,7 +49,7 @@ class StartPaymentView(APIView):
 
             return Response({"data": response.json()}, status=status.HTTP_200_OK)
         except Exception as e:
-            print("Response from exception")
+            print("Response from exception: ", str(e))
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
