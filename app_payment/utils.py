@@ -90,6 +90,7 @@ class Nagad:
             )
             print("Response: ", response.json())
         except requests.RequestException as e:
+            print(f"Exception: {str(e)}")
             raise Exception(f"Exception in Check Out Initialize API {e}")
 
         if response.status_code == 200:
