@@ -79,6 +79,7 @@ class Nagad:
 
         # API call to initialize checkout
         try:
+            print("Response try")
             response = self.client.post(
                 f"{base_url}/api/dfs/check-out/initialize/{self.credentials['merchantID']}/{order_id}",
                 headers=headers,
@@ -88,7 +89,7 @@ class Nagad:
                     'signature': signature,
                 }
             )
-            print("Response: ", response.json())
+            print("Response: ", response.text)
         except requests.RequestException as e:
             print(f"Exception: {str(e)}")
             raise Exception(f"Exception in Check Out Initialize API {e}")
