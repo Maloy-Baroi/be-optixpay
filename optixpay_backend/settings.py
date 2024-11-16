@@ -25,7 +25,7 @@ if not DEBUG:
     print("DOMAINS", DOMAINS)
     ALLOWED_HOSTS = DOMAINS
 else:
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['*']
 
 # if 'CODESPACE_NAME' in os.environ:
 #     codespace_name = config("CODESPACE_NAME")

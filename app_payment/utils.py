@@ -87,7 +87,7 @@ class Nagad:
                     'signature': signature,
                 }
             )
-            print("Response: ", response)
+            print("Response: ", response.json())
         except requests.RequestException as e:
             raise Exception(f"Exception in Check Out Initialize API {e}")
 
