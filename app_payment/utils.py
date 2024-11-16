@@ -68,6 +68,7 @@ class Nagad:
 
         # Get IP address
         ip_address = self.get_ip_address()
+        print(f"IP Address: {ip_address}")
 
         headers = {
             'Content-Type': 'application/json',
