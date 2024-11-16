@@ -45,7 +45,7 @@ class StartPaymentView(APIView):
             )
             payment_obj.save()
             response = nagad.regular_payment(order_id=order_id, amount=amount)
-            print(f"response: {response}")
+            print(f"response: {response.json()}")
 
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
