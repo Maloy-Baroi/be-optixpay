@@ -43,6 +43,7 @@ class StartPaymentView(APIView):
                 paymentMethod="nagad",
                 currency="BDT"
             )
+            print("Payment Object", payment_obj)
             payment_obj.save()
             response = nagad.regular_payment(order_id=order_id, amount=amount)
             print(f"response: {response.json()}")
