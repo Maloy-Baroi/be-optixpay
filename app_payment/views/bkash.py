@@ -121,7 +121,7 @@ class BkashPaymentInitiateAPIView(APIView):
         token = request.data.get('id_token')  # Extract id_token from request
         x_app_key = request.data.get("x_app_key", "0vWQuCRGiUX7EPVjQDr0EUAYtc")  # Default value if not present
         payer_reference = request.data.get('payer_reference', "")  # Default payer reference
-        callback_url = request.data.get("callback_url", "http://localhost:3000/call-back/")  # Default callback URL
+        callback_url = request.data.get("callback_url", "http://optixpay.com/call-back/")  # Default callback URL
         merchant_association_info = request.data.get('merchant_association_info',
                                                      "MI05MID54RF091234560ne")  # Default info
         amount = str(request.data.get('amount', "1"))  # Convert amount to string and default to "1"

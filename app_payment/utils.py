@@ -89,25 +89,29 @@ class Nagad:
                     'signature': signature,
                 }
             )
-            print("Response: ", response.text)
+            # print("Response: ", response.json())
         except requests.RequestException as e:
             print(f"Exception: {str(e)}")
             raise Exception(f"Exception in Check Out Initialize API {e}")
 
         if response.status_code == 200:
             response_body = response.json()
-            print(response_body.get('payment_url'))
-            sensitive_data = response_body['sensitiveData']
-            signature = response_body['signature']
+            # print(response_body.get('payment_url'))
+            sensitive_data = response_body.get('sensitiveData')
+            signature = response_body.get('signature')
+            print(f"Signature: {signature} \nsignature: {signature}")
 
             # Decrypt the response
             decrypted_data = rsa.decrypt(base64.b64decode(sensitive_data), private_key).decode()
             verified = rsa.verify(decrypted_data.encode(), base64.b64decode(signature), public_key)
 
+            print("decrypted data verified", decrypted_data)
+
             if verified:
                 decrypted_data_body = json.loads(decrypted_data)
-                challenge = decrypted_data_body['challenge']
-                payment_reference_id = decrypted_data_body['paymentReferenceId']
+                print(f"decrypted_data_body: {decrypted_data_body}")
+                challenge = decrypted_data_body.get('challenge')
+                payment_reference_id = decrypted_data_body.get('paymentReferenceId')
 
                 raw_data = {
                     'merchantId': self.credentials['merchantID'],
@@ -117,10 +121,12 @@ class Nagad:
                     'challenge': challenge
                 }
                 raw_data_to_be_encrypted = json.dumps(raw_data)
+                print("raw data to be encrypted", raw_data_to_be_encrypted)
                 sensitive_data = base64.b64encode(rsa.encrypt(raw_data_to_be_encrypted.encode(), public_key)).decode()
+                print("sensitive_data", sensitive_data)
                 signature = base64.b64encode(
                     rsa.sign(raw_data_to_be_encrypted.encode(), private_key, 'SHA-256')).decode()
-
+                print(f"Signature: {signature}")
                 try:
                     complete_response = self.client.post(
                         f"{base_url}/api/dfs/check-out/complete/{payment_reference_id}",
@@ -128,14 +134,16 @@ class Nagad:
                         json={
                             'sensitiveData': sensitive_data,
                             'signature': signature,
-                            'merchantCallbackURL': 'http://localhost:3000/call-back',
+                            'merchantCallbackURL': 'http://optixpay.com/call-back',
                             'additionalMerchantInfo': self.additional_merchant_info
                         }
                     )
+                    print("complete response", complete_response)
                 except requests.RequestException as e:
                     raise Exception(f"Exception in Check Out Complete API {e}")
 
                 if complete_response.status_code == 200:
+                    print("complete response json", complete_response.json())
                     return complete_response.json()
                 else:
                     raise Exception(

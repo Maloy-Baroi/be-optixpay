@@ -46,9 +46,8 @@ class StartPaymentView(APIView):
             print("Payment Object", payment_obj)
             payment_obj.save()
             response = nagad.regular_payment(order_id=order_id, amount=amount)
-            print(f"response: {response.json()}")
-
-            return Response({"data": response.json()}, status=status.HTTP_200_OK)
+            print("create response data:", response['callBackUrl'])
+            return Response({"callBackUrl": response['callBackUrl']}, status=status.HTTP_200_OK)
         except Exception as e:
             print("Response from exception: ", str(e))
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
